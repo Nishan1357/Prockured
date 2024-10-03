@@ -45,6 +45,7 @@ public class UserController {
 
 
     // User login with session management (GET)
+    //http://localhost:8080/users/login
     @GetMapping("/login")
     public ResponseEntity<String> loginUser(@RequestParam String phoneNumber, @RequestParam String password, HttpServletRequest request) {
         Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
@@ -61,6 +62,7 @@ public class UserController {
     }
 
     // User logout
+    //http://localhost:8080/users/logout
     @GetMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // false means do not create a new session
@@ -72,6 +74,7 @@ public class UserController {
     }
 
     // Check if user is logged in
+    //http://localhost:8080/users/check-session
     @GetMapping("/check-session")
     public ResponseEntity<String> checkSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // Get existing session, do not create new
