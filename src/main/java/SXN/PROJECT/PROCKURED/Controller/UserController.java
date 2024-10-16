@@ -1,6 +1,10 @@
 package SXN.PROJECT.PROCKURED.Controller;
+
+import SXN.PROJECT.PROCKURED.DTO.UserProfileDTO;
 import SXN.PROJECT.PROCKURED.DTO.UserRegistrationDTO;
 import SXN.PROJECT.PROCKURED.Model.User;
+import SXN.PROJECT.PROCKURED.Model.UserProfile;
+import SXN.PROJECT.PROCKURED.Repository.UserProfileRepository;
 import SXN.PROJECT.PROCKURED.Repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RestController
@@ -18,9 +23,10 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
     // User registration
-    //http://localhost:8080/users/register
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO registrationDTO) {
         if (!registrationDTO.getPassword().equals(registrationDTO.getConfirmPassword())) {
@@ -43,9 +49,7 @@ public class UserController {
         return ResponseEntity.ok("User registered successfully.");
     }
 
-
     // User login with session management (GET)
-    //http://localhost:8080/users/login
     @GetMapping("/login")
     public ResponseEntity<String> loginUser(@RequestParam String phoneNumber, @RequestParam String password, HttpServletRequest request) {
         Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
@@ -62,7 +66,6 @@ public class UserController {
     }
 
     // User logout
-    //http://localhost:8080/users/logout
     @GetMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // false means do not create a new session
@@ -74,7 +77,6 @@ public class UserController {
     }
 
     // Check if user is logged in
-    //http://localhost:8080/users/check-session
     @GetMapping("/check-session")
     public ResponseEntity<String> checkSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // Get existing session, do not create new
@@ -82,5 +84,67 @@ public class UserController {
             return ResponseEntity.ok("User is logged in.");
         }
         return ResponseEntity.status(401).body("No active session, user is logged out.");
+    }
+
+    // Create profile for logged-in user
+    @PostMapping("/profile")
+    public ResponseEntity<String> createProfile(@RequestBody UserProfileDTO profileDTO, HttpSession session) {
+        // Check if user is logged in
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).body("User is not logged in.");
+        }
+
+        // Retrieve the logged-in user entity
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+
+        // Check if profile already exists
+        Optional<UserProfile> existingProfile = userProfileRepository.findByUser(user.get());
+        if (existingProfile.isPresent()) {
+            return ResponseEntity.badRequest().body("Profile already exists.");
+        }
+
+        // Create new profile
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user.get());
+        userProfile.setName(profileDTO.getName());
+        userProfile.setEmail(profileDTO.getEmail());
+        userProfile.setCity(profileDTO.getCity());
+        userProfile.setPincode(profileDTO.getPincode());
+        userProfile.setState(profileDTO.getState());
+        userProfile.setCountry(profileDTO.getCountry());
+        userProfile.setCreatedAt(LocalDateTime.now());
+        userProfile.setUpdatedAt(LocalDateTime.now());
+
+        userProfileRepository.save(userProfile);
+
+        return ResponseEntity.ok("Profile created successfully.");
+    }
+
+    // Get profile for logged-in user
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(HttpSession session) {
+        // Check if user is logged in
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).body("User is not logged in.");
+        }
+
+        // Retrieve the logged-in user entity
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(404).body("User not found.");
+        }
+
+        // Retrieve the user's profile
+        Optional<UserProfile> userProfile = userProfileRepository.findByUser(user.get());
+        if (userProfile.isPresent()) {
+            return ResponseEntity.ok(userProfile.get());
+        } else {
+            return ResponseEntity.status(404).body("Profile not found.");
+        }
     }
 }
