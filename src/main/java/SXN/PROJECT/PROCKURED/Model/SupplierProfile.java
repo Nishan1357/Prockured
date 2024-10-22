@@ -4,22 +4,21 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_profiles")
-public class UserProfile {
+@Table(name = "supplier_profiles")
+public class SupplierProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Foreign key referencing users table
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user"))
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId; // Foreign key referencing users table
 
     private String name;
-    private String email;
+    private String businessName;
+    private String emailAddress;
     private String city;
-    private int pincode;
+    private String pincode;
     private String state;
     private String country;
 
@@ -29,14 +28,14 @@ public class UserProfile {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Default constructor
-    public UserProfile() {}
+    // Constructors, Getters, and Setters...
+    public SupplierProfile() {}
 
-    // Constructor with parameters
-    public UserProfile(User user, String name, String email, String city, int pincode, String state, String country, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.user = user;
+    public SupplierProfile(Long userId, String name, String businessName, String emailAddress, String city, String pincode, String state, String country, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.userId = userId;
         this.name = name;
-        this.email = email;
+        this.businessName = businessName;
+        this.emailAddress = emailAddress;
         this.city = city;
         this.pincode = pincode;
         this.state = state;
@@ -46,6 +45,8 @@ public class UserProfile {
     }
 
     // Getters and Setters
+
+
     public Long getId() {
         return id;
     }
@@ -54,12 +55,12 @@ public class UserProfile {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -70,12 +71,20 @@ public class UserProfile {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getBusinessName() {
+        return businessName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getCity() {
@@ -86,11 +95,11 @@ public class UserProfile {
         this.city = city;
     }
 
-    public int getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(int pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 

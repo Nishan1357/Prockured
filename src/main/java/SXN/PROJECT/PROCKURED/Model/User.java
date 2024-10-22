@@ -1,28 +1,37 @@
 package SXN.PROJECT.PROCKURED.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users") // This tells Hibernate to create a table named 'users'
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generate the primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(name = "PhoneNumber") // Customize column name, uniqueness, and nullability
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
-//    @Column(name = "Password") // Make sure password cannot be null
+    @Column(name = "password")
     private String password;
 
-//    @Column(name = "Registered_at") // Custom column name for date
-    private LocalDate registeredAt;
+    @Enumerated(EnumType.STRING) // Use EnumType.STRING to store enum as a string
+    private UserModeEnum mode;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     // Getters and setters...
+    // Constructors...
 
+    public User() {}
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -47,11 +56,27 @@ public class User {
         this.password = password;
     }
 
-    public LocalDate getRegisteredAt() {
-        return registeredAt;
+    public UserModeEnum getMode() {
+        return mode;
     }
 
-    public void setRegisteredAt(LocalDate registeredAt) {
-        this.registeredAt = registeredAt;
+    public void setMode(UserModeEnum mode) {
+        this.mode = mode;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

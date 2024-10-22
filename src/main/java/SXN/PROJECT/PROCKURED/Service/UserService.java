@@ -27,7 +27,7 @@ public class UserService {
         User newUser = new User();
         newUser.setPhoneNumber(userRegistrationDTO.getPhoneNumber());
         newUser.setPassword(userRegistrationDTO.getPassword());
-        newUser.setRegisteredAt(LocalDate.now());
+        newUser.setCreatedAt(LocalDate.now().atStartOfDay());
 
         userRepository.save(newUser);
         return "User registered successfully!";
